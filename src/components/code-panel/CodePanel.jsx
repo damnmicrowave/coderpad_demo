@@ -73,7 +73,6 @@ export const CodePanel = ({ runProgram }) => {
     }
   }, [changeCode, currentCode, currentLang])
   useEffect(() => {
-    console.log(editorInstance.commands)
     editorInstance.commands.removeCommand('findnext')  // to free the Ctrl+K shortcut
     editorInstance.commands.removeCommand('togglecomment')  // to force usage of the shortcut (:
     window.addEventListener('keydown', commentCode)
