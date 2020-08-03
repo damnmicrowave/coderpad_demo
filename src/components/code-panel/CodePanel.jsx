@@ -55,7 +55,7 @@ export const CodePanel = ({ runProgram }) => {
   }, [currentLang])
 
   const commentCode = useCallback(e => {
-    if ( e.ctrlKey && e.key === 'k' ) {
+    if ( e.ctrlKey && ( e.key === 'k' || e.key === 'л' ) ) {
       e.preventDefault()
       const { commentToken } = languages.entities[currentLang]
       const startRow = editorInstance.selection.getAnchor().row
@@ -73,7 +73,9 @@ export const CodePanel = ({ runProgram }) => {
     }
   }, [changeCode, currentCode, currentLang])
   useEffect(() => {
+    console.log(editorInstance.commands)
     editorInstance.commands.removeCommand('findnext')  // to free the Ctrl+K shortcut
+    editorInstance.commands.removeCommand('togglecomment')  // to force usage of the shortcut (:
     window.addEventListener('keydown', commentCode)
     return () => window.removeEventListener('keydown', commentCode)
   }, [commentCode])
@@ -122,6 +124,7 @@ export const CodePanel = ({ runProgram }) => {
           enableSnippets: false,
           showLineNumbers: true,
           tabSize: 4,
+          autoScrollEditorIntoView: true
         }}/>
     </div>
   )
