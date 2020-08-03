@@ -1,0 +1,47 @@
+@import "src/atoms";
+
+.rightPanel {
+  height: 100%;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  height: 56px;
+  padding: 0 1rem;
+
+  button {
+    background-color: $background-color;
+    color: $text-secondary;
+    font-size: 14px;
+    cursor: pointer;
+    padding: .5rem 5px;
+    margin-right: 1rem;
+    border: none;
+    border-bottom: 2px solid $text-secondary;
+    transition: .2s;
+
+    &:hover {
+      color: $text-main;
+    }
+
+    &.buttonActive {
+      color: $text-main;
+      border-bottom-color: $text-main;
+    }
+  }
+}
+
+.tabWrapper {
+  height: calc(100% - 56px);
+}
+
+.programOutput {
+  cursor: default;
+  padding: 1rem;
+  color: $text-main;
+
+  span {
+    color: $text-secondary;
+  }
+}
