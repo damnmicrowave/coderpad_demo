@@ -30,7 +30,8 @@ export const CodeEditor = ({ name, onChange, value, placeholder, mode, theme, on
     if ( onLoad ) onLoad(codeInput.current)
   }, [onLoad, onScroll])
 
-  const handleLongLines = () => {
+  const handleLongLines = e => {
+    e.preventDefault()
     if ( codeOutput ) {
       // noinspection JSUnresolvedVariable
       codeOutput.scrollLeft = codeInput.current.scrollLeft
@@ -66,6 +67,9 @@ export const CodeEditor = ({ name, onChange, value, placeholder, mode, theme, on
         // handle scroll on text selection drag
         onMouseDown={() => window.addEventListener('mousemove', handleLongLines)}
         onMouseUp={() => window.removeEventListener('mousemove', handleLongLines)}
+        // handle scroll on mobile devices
+        onTouchStart={() => window.addEventListener('touchmove', handleLongLines)}
+        onTouchEnd={() => window.removeEventListener('touchmove', handleLongLines)}
       />
       <SyntaxHighlighter
         id={name}
