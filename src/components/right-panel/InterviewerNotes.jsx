@@ -1,42 +1,27 @@
 import React, { useState } from 'react'
-import AceEditor from 'react-ace';
+import { twilight } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+import { CodeEditor } from '..';
 
-import 'ace-builds/src-min-noconflict/theme-twilight'
-import 'ace-builds/src-min-noconflict/mode-markdown'
-import 'ace-builds/src-min-noconflict/ext-language_tools'
 
 export const InterviewerNotes = () => {
 
   const [currentNote, setCurrentNote] = useState('interviewerNotes' in localStorage ? localStorage.interviewerNotes : '')
 
-  const onNoteChange = value => {
+  const changeNote = value => {
     localStorage.interviewerNotes = value
     setCurrentNote(value)
   }
 
   return (
-    <AceEditor
-      onChange={onNoteChange}
-      value={currentNote}
-      style={{
-        width: '100%',
-        height: '100%'
+    <CodeEditor
+      name='noteEditor'
+      onChange={e => {
+        changeNote(e.target.value)
       }}
-      placeholder='Write your notes here'
+      value={currentNote}
       mode='markdown'
-      theme='twilight'
-      name='nodeEditor'
-      fontSize={14}
-      showPrintMargin={false}
-      showGutter={false}
-      highlightActiveLine={true}
-      setOptions={{
-        cursorStyle: 'smooth',
-        enableBasicAutocompletion: true,
-        enableLiveAutocompletion: true,
-        enableSnippets: false,
-        showLineNumbers: false,
-        tabSize: 2
-      }}/>
+      theme={twilight}
+      placeholder='Write your notes here'
+    />
   )
 }

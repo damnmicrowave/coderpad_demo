@@ -1,32 +1,25 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import AceEditor from 'react-ace'
+import { CodeEditor } from '..';
+import { twilight } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { SelectPopup } from './components'
 
 import styles from './CodePanel.module.scss'
 import { ReactComponent as ArrowSVG } from './media/arrow.svg'
 
-import 'ace-builds/src-min-noconflict/theme-twilight'
-import 'ace-builds/src-min-noconflict/mode-python'
-import 'ace-builds/src-min-noconflict/mode-javascript'
-import 'ace-builds/src-min-noconflict/mode-java'
-import 'ace-builds/src-min-noconflict/mode-c_cpp'
-import 'ace-builds/src-min-noconflict/mode-plain_text'
-import 'ace-builds/src-min-noconflict/mode-golang'
-import 'ace-builds/src-min-noconflict/ext-language_tools'
 
 const languages = {
-  ids: ['c_cpp', 'golang', 'java', 'javascript', 'plain_text', 'python'],
+  ids: ['cpp', 'go', 'java', 'javascript', 'plain_text', 'python'],
   entities: {
     python: { name: 'Python', commentToken: '#' },
     javascript: { name: 'JavaScript', commentSymbol: '//' },
     java: { name: 'Java', commentToken: '//' },
-    c_cpp: { name: 'C++', commentToken: '//' },
+    cpp: { name: 'C++', commentToken: '//' },
     plain_text: { name: 'Plain Text', commentToken: '' },
-    golang: { name: 'Go', commentToken: '//' }
+    go: { name: 'Go', commentToken: '//' }
   }
 }
 
-let editorInstance = undefined;
+let editorInstance = undefined
 
 export const CodePanel = ({ runProgram }) => {
   const getCodeByLang = lang => lang in localStorage ? localStorage[lang] : (() => {
@@ -36,12 +29,6 @@ export const CodePanel = ({ runProgram }) => {
 
   const [currentLang, setCurrentLang] = useState('plain_text')
   const [currentCode, setCurrentCode] = useState(getCodeByLang(currentLang))
-
-  useEffect(() => {
-    if ( !currentCode ) editorInstance.setValue('', -1)
-    // need to use this effect if only the lang is changed, not code (or it'll break autocomplition)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentLang])
 
   const selectLang = lang => {
     setCurrentLang(lang)
@@ -55,11 +42,12 @@ export const CodePanel = ({ runProgram }) => {
   }, [currentLang])
 
   const commentCode = useCallback(e => {
-    if ( e.ctrlKey && ( e.key === 'k' || e.key === 'л' ) ) {
+    if ( e.ctrlKey && (e.key === 'k' || e.key === 'л') ) {
       e.preventDefault()
       const { commentToken } = languages.entities[currentLang]
-      const startRow = editorInstance.selection.getAnchor().row
-      const endRow = editorInstance.selection.getCursor().row
+      const { selectionStart, selectionEnd } = editorInstance
+      const startRow = Array.from(currentCode).slice(0, selectionStart).filter(c => c === '\n').length
+      const endRow = Array.from(currentCode).slice(0, selectionEnd).filter(c => c === '\n').length
       const commentedCode = currentCode.split('\n').map((item, index) => {
         if ( startRow <= index && index <= endRow && commentToken ) {
           if ( item.startsWith(commentToken) ) {
@@ -73,10 +61,8 @@ export const CodePanel = ({ runProgram }) => {
     }
   }, [changeCode, currentCode, currentLang])
   useEffect(() => {
-    editorInstance.commands.removeCommand('findnext')  // to free the Ctrl+K shortcut
-    editorInstance.commands.removeCommand('togglecomment')  // to force usage of the shortcut (:
-    window.addEventListener('keydown', commentCode)
-    return () => window.removeEventListener('keydown', commentCode)
+    editorInstance.addEventListener('keydown', commentCode)
+    return () => editorInstance.removeEventListener('keydown', commentCode)
   }, [commentCode])
 
   return (
@@ -98,33 +84,17 @@ export const CodePanel = ({ runProgram }) => {
           onSelect={selectLang}
         />
       </div>
-      <AceEditor
-        onChange={changeCode}
-        onLoad={(editor => {
-          editorInstance = editor
-        })}
-        value={currentCode}
-        style={{
-          width: '100%',
-          height: 'calc(100% - 56px)'
-        }}
-        placeholder='Write your code here'
-        mode={currentLang}
-        theme='twilight'
+      <CodeEditor
         name='codeEditor'
-        fontSize={14}
-        showPrintMargin={false}
-        showGutter={true}
-        highlightActiveLine={true}
-        setOptions={{
-          cursorStyle: 'smooth',
-          enableBasicAutocompletion: true,
-          enableLiveAutocompletion: true,
-          enableSnippets: false,
-          showLineNumbers: true,
-          tabSize: 4,
-          autoScrollEditorIntoView: true
-        }}/>
+        onChange={e => {
+          changeCode(e.target.value)
+        }}
+        value={currentCode}
+        mode={currentLang}
+        theme={twilight}
+        placeholder='Write your code here'
+        onLoad={editor => editorInstance = editor}
+      />
     </div>
   )
 }
