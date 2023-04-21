@@ -10,10 +10,10 @@
     "node-sass": "^4.14.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-scripts": "3.4.1",
+    "react-scripts": "5.0.1",
     "react-split": "^2.0.9",
     "react-syntax-highlighter": "^13.2.1",
-    "serve": "^11.3.2"
+    "serve": "^14.2.0"
   },
   "scripts": {
     "start": "BROWSER=none react-scripts start",
